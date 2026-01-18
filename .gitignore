@@ -1,0 +1,41 @@
+# Zephyr build artifacts
+build*/
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+
+# West workspace
+.west/
+zephyr/
+modules/
+tools/
+bootloader/
+cmsis/
+hal_stm32/
+mbedtls/
+mcuboot/
+tinycrypt/
+segger/
+net-tools/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

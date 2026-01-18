@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: Apache-2.0
+
+config CAN_UPDATE
+	bool "CAN Bus Firmware Update Support"
+	depends on CAN && FLASH && IMG_MANAGER
+	help
+	  Enable firmware update over CAN bus. This driver receives
+	  firmware image chunks over CAN and writes them to flash
+	  using the Zephyr image manager.
+
+if CAN_UPDATE
+
+config CAN_UPDATE_FILTER_ID
+	hex "CAN filter ID for firmware updates"
+	default 0x100
+	help
+	  CAN message ID used for firmware update data transfers.
+
+config CAN_UPDATE_CHUNK_SIZE
+	int "Maximum chunk size for CAN updates"
+	default 64
+	range 8 64
+	help
+	  Maximum size of firmware chunks sent per CAN message.
+
+config CAN_UPDATE_TIMEOUT_MS
+	int "Timeout for CAN update operations (ms)"
+	default 5000
+	help
+	  Timeout in milliseconds for CAN update operations.
+
+endif # CAN_UPDATE

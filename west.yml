@@ -1,0 +1,27 @@
+manifest:
+  version: "0.13"
+
+  defaults:
+    remote: zephyrproject
+
+  remotes:
+    - name: zephyrproject
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject
+      revision: v4.0.0
+      import:
+        name-allowlist:
+          - cmsis
+          - hal_stm32
+          - mbedtls
+          - mcuboot
+          - tinycrypt
+          - segger
+          - net-tools
+
+  self:
+    path: workspace
+    west-commands: scripts/west-commands.yml

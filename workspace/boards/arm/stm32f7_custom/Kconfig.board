@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_STM32F7_CUSTOM
+	bool "STM32F7 Custom Board"
+	depends on SOC_STM32F767XX

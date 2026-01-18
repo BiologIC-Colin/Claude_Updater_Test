@@ -1,0 +1,16 @@
+identifier: stm32f7_custom
+name: STM32F7_Custom
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
+ram: 512
+flash: 2048
+supported:
+  - can
+  - gpio
+  - uart
+  - watchdog
+  - counter

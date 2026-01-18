@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "Custom Workspace Configuration"
+
+rsource "drivers/Kconfig"
+rsource "libs/Kconfig"
+
+source "Kconfig.zephyr"

@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_STM32F7_CUSTOM
+
+config BOARD
+	default "stm32f7_custom"
+
+if NETWORKING
+
+config NET_L2_ETHERNET
+	default y
+
+endif # NETWORKING
+
+if CAN
+
+config CAN_INIT_PRIORITY
+	default 80
+
+endif # CAN
+
+endif # BOARD_STM32F7_CUSTOM

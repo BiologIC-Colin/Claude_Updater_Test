@@ -1,0 +1,126 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include <st/f7/stm32f767Xi.dtsi>
+#include <st/f7/stm32f767zitx-pinctrl.dtsi>
+
+/ {
+	model = "STM32F7 Custom Board";
+	compatible = "st,stm32f7-custom";
+
+	chosen {
+		zephyr,console = &usart3;
+		zephyr,shell-uart = &usart3;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,canbus = &can1;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		green_led: led_0 {
+			gpios = <&gpiob 0 GPIO_ACTIVE_HIGH>;
+			label = "User LD1";
+		};
+		blue_led: led_1 {
+			gpios = <&gpiob 7 GPIO_ACTIVE_HIGH>;
+			label = "User LD2";
+		};
+		red_led: led_2 {
+			gpios = <&gpiob 14 GPIO_ACTIVE_HIGH>;
+			label = "User LD3";
+		};
+	};
+
+	aliases {
+		led0 = &green_led;
+		led1 = &blue_led;
+		led2 = &red_led;
+		mcuboot-led0 = &green_led;
+		mcuboot-button0 = &user_button;
+	};
+
+	gpio_keys {
+		compatible = "gpio-keys";
+		user_button: button_0 {
+			label = "User";
+			gpios = <&gpioc 13 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};
+
+&clk_lsi {
+	status = "okay";
+};
+
+&clk_hse {
+	clock-frequency = <DT_FREQ_M(25)>;
+	status = "okay";
+};
+
+&pll {
+	div-m = <25>;
+	mul-n = <432>;
+	div-p = <2>;
+	div-q = <9>;
+	clocks = <&clk_hse>;
+	status = "okay";
+};
+
+&rcc {
+	clocks = <&pll>;
+	clock-frequency = <DT_FREQ_M(216)>;
+	ahb-prescaler = <1>;
+	apb1-prescaler = <4>;
+	apb2-prescaler = <2>;
+};
+
+&usart3 {
+	pinctrl-0 = <&usart3_tx_pd8 &usart3_rx_pd9>;
+	pinctrl-names = "default";
+	current-speed = <115200>;
+	status = "okay";
+};
+
+&can1 {
+	pinctrl-0 = <&can1_rx_pd0 &can1_tx_pd1>;
+	pinctrl-names = "default";
+	bus-speed = <500000>;
+	status = "okay";
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 DT_SIZE_K(128)>;
+			read-only;
+		};
+
+		slot0_partition: partition@20000 {
+			label = "image-0";
+			reg = <0x00020000 DT_SIZE_K(448)>;
+		};
+
+		slot1_partition: partition@90000 {
+			label = "image-1";
+			reg = <0x00090000 DT_SIZE_K(448)>;
+		};
+
+		storage_partition: partition@100000 {
+			label = "storage";
+			reg = <0x00100000 DT_SIZE_K(896)>;
+		};
+	};
+};
+
+&iwdg {
+	status = "okay";
+};

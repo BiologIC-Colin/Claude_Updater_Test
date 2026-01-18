@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+
+config UPDATE_PROTOCOL
+	bool "Firmware Update Protocol Library"
+	help
+	  Common protocol definitions and utilities for firmware updates.
+	  Provides encoding/decoding functions for update messages.
