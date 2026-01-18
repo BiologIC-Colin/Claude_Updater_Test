@@ -239,7 +239,7 @@ int can_update_init(const struct device *dev)
 	/* Setup CAN filter */
 	filter.id = CAN_UPDATE_FILTER_ID;
 	filter.mask = CAN_STD_ID_MASK;
-	filter.flags = CAN_FILTER_DATA | CAN_FILTER_IDE;
+	filter.flags = 0; /* Standard 11-bit ID, data frames */
 
 	ret = can_add_rx_filter(can_dev, can_rx_callback, NULL, &filter);
 	if (ret < 0) {

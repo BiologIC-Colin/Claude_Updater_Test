@@ -1,7 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
-zephyr_library()
-zephyr_library_sources(can_update.c)
+# Add sources to app target instead of creating a library
+target_sources(app PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/can_update.c
+)
 
-# Export include directory to interface
-zephyr_include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+# Export include directory
+target_include_directories(app PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
