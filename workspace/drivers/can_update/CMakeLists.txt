@@ -2,4 +2,6 @@
 
 zephyr_library()
 zephyr_library_sources(can_update.c)
-zephyr_library_include_directories(.)
+
+# Export include directory to interface
+zephyr_include_directories(${CMAKE_CURRENT_SOURCE_DIR})

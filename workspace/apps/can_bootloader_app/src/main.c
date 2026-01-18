@@ -13,7 +13,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/reboot.h>
 
-#include "../../drivers/can_update/can_update.h"
+#include "can_update.h"
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
@@ -21,9 +21,14 @@ LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 #define LED0_NODE DT_ALIAS(led0)
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
-/* CAN device */
-#define CAN_NODE DT_ALIAS(canbus)
-static const struct device *can_dev = DEVICE_DT_GET(CAN_NODE);
+/* CAN device - use CAN1 directly */
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(can1), okay)
+#define CAN_DEV DEVICE_DT_GET(DT_NODELABEL(can1))
+#define HAS_CAN_BUS 1
+#else
+#define HAS_CAN_BUS 0
+#warning "No CAN bus available on this board"
+#endif
 
 /* Status LED blink thread */
 #define LED_THREAD_STACK_SIZE 512
@@ -99,15 +104,20 @@ int main(void)
 	}
 
 	/* Initialize CAN update driver */
-	ret = can_update_init(can_dev);
+#if HAS_CAN_BUS
+	ret = can_update_init(CAN_DEV);
 	if (ret) {
 		LOG_ERR("Failed to initialize CAN update: %d", ret);
 		return -1;
 	}
-
 	LOG_INF("System initialized, waiting for CAN updates...");
+#else
+	LOG_WRN("CAN bus not available, update functionality disabled");
+	LOG_INF("System initialized");
+#endif
 
 	/* Monitor for update completion and reboot if needed */
+#if HAS_CAN_BUS
 	enum can_update_status last_status = CAN_UPDATE_STATUS_IDLE;
 
 	while (1) {
@@ -122,6 +132,12 @@ int main(void)
 		last_status = status;
 		k_sleep(K_MSEC(100));
 	}
+#else
+	/* Just blink LED without CAN functionality */
+	while (1) {
+		k_sleep(K_SECONDS(1));
+	}
+#endif
 
 	return 0;
 }
