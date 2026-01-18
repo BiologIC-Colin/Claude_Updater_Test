@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "CAN Bootloader Application"
+
+# Source custom modules
+rsource "../../drivers/Kconfig"
+rsource "../../libs/Kconfig"
+
+# Source Zephyr Kconfig
+source "Kconfig.zephyr"
