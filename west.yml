@@ -15,7 +15,7 @@ manifest:
       import:
         # Only import essential modules for STM32F7 CAN bootloader
         name-allowlist:
-          - cmsis      # ARM CMSIS headers
+          - cmsis_6      # ARM CMSIS headers
           - hal_stm32  # STM32 HAL
           - mcuboot    # Bootloader
           - mbedtls    # Crypto for MCUboot image signing
