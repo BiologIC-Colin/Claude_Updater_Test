@@ -12,7 +12,14 @@ manifest:
     - name: zephyr
       remote: zephyrproject
       revision: main
-      import: true
+      import:
+        # Only import essential modules for STM32F7 CAN bootloader
+        name-allowlist:
+          - cmsis      # ARM CMSIS headers
+          - hal_stm32  # STM32 HAL
+          - mcuboot    # Bootloader
+          - mbedtls    # Crypto for MCUboot image signing
+          - tinycrypt  # Alternative crypto library
 
   self:
     path: workspace
