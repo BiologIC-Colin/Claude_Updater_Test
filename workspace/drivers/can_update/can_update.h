@@ -13,6 +13,23 @@ extern "C" {
 #endif
 
 /**
+ * @brief J1939 Transport Protocol Control Bytes
+ */
+#define J1939_TP_CM_RTS   16  /* Request to Send */
+#define J1939_TP_CM_CTS   17  /* Clear to Send */
+#define J1939_TP_CM_EOM   19  /* End of Message Acknowledgment */
+#define J1939_TP_CM_BAM   32  /* Broadcast Announce Message */
+#define J1939_TP_CM_ABORT 255 /* Connection Abort */
+
+/**
+ * @brief J1939 PGN Definitions
+ */
+#define J1939_PGN_TP_CM 0xEC00  /* Transport Protocol - Connection Management */
+#define J1939_PGN_TP_DT 0xEB00  /* Transport Protocol - Data Transfer */
+#define J1939_PGN_REQUEST 0xEA00 /* Request PGN */
+#define J1939_PGN_FIRMWARE_UPDATE 0xEF00 /* Custom PGN for firmware updates */
+
+/**
  * @brief CAN Update Protocol Message Types
  */
 enum can_update_msg_type {
@@ -63,6 +80,32 @@ int can_update_stop(void);
  * @return Current update status
  */
 enum can_update_status can_update_get_status(void);
+
+/**
+ * @brief Helper to build J1939 29-bit CAN ID
+ *
+ * @param priority Priority (0-7, lower is higher priority)
+ * @param pgn Parameter Group Number
+ * @param src_addr Source address
+ * @param dst_addr Destination address (0xFF for broadcast)
+ * @return 29-bit CAN ID
+ */
+static inline uint32_t j1939_build_can_id(uint8_t priority, uint32_t pgn,
+                                           uint8_t src_addr, uint8_t dst_addr)
+{
+	uint32_t can_id = 0x80000000; /* Extended frame */
+	can_id |= (priority & 0x07) << 26;
+	can_id |= (pgn & 0x3FFFF) << 8;
+	can_id |= (src_addr & 0xFF);
+
+	/* For PDU1 format (PF < 240), include destination address */
+	if (((pgn >> 8) & 0xFF) < 240) {
+		can_id &= ~(0xFF << 8);
+		can_id |= (dst_addr & 0xFF) << 8;
+	}
+
+	return can_id;
+}
 
 #ifdef __cplusplus
 }
