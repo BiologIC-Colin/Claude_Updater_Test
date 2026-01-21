@@ -7,17 +7,29 @@ This is a complete out-of-tree Zephyr RTOS workspace template with MCUboot secur
 ```
 .
 ├── west.yml                          # West manifest for dependencies
-├── workspace/
+├── workspace/                        # Zephyr out-of-tree module
+│   ├── zephyr/
+│   │   └── module.yml                # Zephyr module configuration
+│   ├── CMakeLists.txt                # Top-level build integration
+│   ├── Kconfig                       # Top-level Kconfig
 │   ├── boards/                       # Custom board definitions
 │   │   └── arm/
 │   │       └── stm32f7_custom/       # STM32F7 custom board
-│   ├── drivers/                      # Custom drivers
-│   │   └── can_update/               # CAN firmware update driver
-│   ├── libs/                         # Custom libraries
-│   │   └── update_protocol/          # Firmware update protocol
+│   ├── drivers/                      # Hardware drivers
+│   │   ├── can_update/               # CAN firmware update driver
+│   │   ├── CMakeLists.txt            # Drivers build file
+│   │   └── Kconfig                   # Drivers configuration
+│   ├── libs/                         # Protocol libraries
+│   │   ├── update_protocol/          # Firmware update protocol
+│   │   ├── j1939_address_claim/      # J1939 Address Claim library
+│   │   ├── CMakeLists.txt            # Libraries build file
+│   │   └── Kconfig                   # Libraries configuration
 │   ├── apps/                         # Applications
 │   │   └── can_bootloader_app/       # CAN bootloader demo app
 │   └── scripts/                      # West command extensions
+│       └── west-commands.yml
+├── j1939_firmware_sender.py          # Python sender for Raspberry Pi
+├── J1939_FIRMWARE_UPDATE.md          # J1939 protocol documentation
 └── README.md                         # This file
 ```
 
@@ -25,9 +37,11 @@ This is a complete out-of-tree Zephyr RTOS workspace template with MCUboot secur
 
 - **Out-of-tree Zephyr workspace**: Clean separation from Zephyr SDK
 - **MCUboot integration**: Secure bootloader with image verification
-- **CAN bus updates**: Firmware updates over CAN interface
+- **J1939 CAN bus updates**: Firmware updates over CAN with J1939 Transport Protocol
+- **J1939 Address Claim**: Automatic address assignment following SAE J1939-81
 - **STM32F7 HAL**: Full hardware abstraction layer support
 - **Custom board support**: Template for STM32F767 with CAN
+- **Python sender application**: Raspberry Pi firmware sender with J1939 support
 - **Modular architecture**: Separate repos for boards, drivers, libs, and apps
 
 ## Prerequisites
@@ -233,6 +247,52 @@ To add a new library:
 1. Create library directory: `workspace/libs/<lib_name>/`
 2. Add `Kconfig`, `CMakeLists.txt`, sources
 3. Update `workspace/libs/Kconfig` and `CMakeLists.txt`
+
+### Available Libraries
+
+#### J1939 Address Claim (`workspace/libs/j1939_address_claim/`)
+
+Implements SAE J1939-81 Address Claim for automatic CAN bus address assignment.
+
+**Features:**
+- Dynamic address assignment with contention resolution
+- 64-bit NAME management with priority handling
+- Arbitrary addressing support
+- Thread-safe operation
+- Callback notifications for state changes
+
+**Documentation:** See `workspace/libs/j1939_address_claim/README.md`
+
+**Quick Start:**
+```c
+#include "j1939_address_claim.h"
+
+// Build NAME
+j1939_name_t name = j1939_name_build(12345, 0, 0, 0, 130, 0, 0, 0, true);
+
+// Configure
+struct j1939_ac_config config = {
+    .can_dev = CAN_DEV,
+    .name = name,
+    .preferred_address = 0x80,
+    .arbitrary_capable = true,
+    .claim_timeout_ms = 250,
+};
+
+// Initialize and start
+j1939_address_claim_init(&config, callback, NULL);
+j1939_address_claim_start();
+
+// Get claimed address
+uint8_t addr = j1939_address_claim_get_address();
+```
+
+**Configuration:**
+```conf
+CONFIG_J1939_ADDRESS_CLAIM=y
+CONFIG_J1939_AC_ARBITRARY_CAPABLE=y
+CONFIG_J1939_AC_CLAIM_TIMEOUT_MS=250
+```
 
 ## Security Considerations
 

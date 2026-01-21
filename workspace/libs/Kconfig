@@ -3,5 +3,6 @@
 menu "Custom Libraries"
 
 rsource "update_protocol/Kconfig"
+rsource "j1939_address_claim/Kconfig"
 
 endmenu

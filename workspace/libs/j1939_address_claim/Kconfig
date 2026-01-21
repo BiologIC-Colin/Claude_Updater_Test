@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: Apache-2.0
+
+config J1939_ADDRESS_CLAIM
+	bool "J1939 Address Claim Support"
+	depends on CAN
+	help
+	  Enable J1939 Address Claim functionality for dynamic address
+	  assignment on CAN bus networks following SAE J1939-81 specification.
+
+if J1939_ADDRESS_CLAIM
+
+config J1939_AC_DEFAULT_PRIORITY
+	int "Default J1939 priority for Address Claim messages"
+	default 6
+	range 0 7
+	help
+	  Default priority for J1939 Address Claim messages (0-7, lower is higher priority).
+	  Default is 6 per J1939 specification.
+
+config J1939_AC_CLAIM_TIMEOUT_MS
+	int "Address Claim timeout in milliseconds"
+	default 250
+	range 100 1000
+	help
+	  Time to wait after sending Address Claimed message before considering
+	  the address successfully claimed. Default is 250ms per J1939-81 spec.
+
+config J1939_AC_DEFAULT_MANUFACTURER_CODE
+	int "Default manufacturer code"
+	default 0
+	range 0 2047
+	help
+	  11-bit manufacturer code (0-2047). Use 0 for unassigned/testing.
+	  Contact SAE to get an official manufacturer code.
+
+config J1939_AC_ARBITRARY_CAPABLE
+	bool "Enable arbitrary address capable mode by default"
+	default y
+	help
+	  If enabled, the device can claim any available address on the bus
+	  if the preferred address is already taken. If disabled, the device
+	  can only use its preferred address.
+
+endif # J1939_ADDRESS_CLAIM
